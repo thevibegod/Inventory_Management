@@ -3,13 +3,41 @@ const Product = require('../Schemas/products')
 const { v4: uuidv4 } = require('uuid')
 
 // Get product(s)
-router.get('/', async (req, res) => {
+const read_handler = async (req, res) => {
+    try {
+        let query = {}
 
-})
+        if (req.query.id)
+            query = { prodcutID: req.query.id }
+
+        let products = await Product.find(query)
+
+        if (query.prodcutID != undefined && products.length == 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No product found with such id."
+            })
+        }
+
+
+        return res.status(200).json({
+            success: true,
+            message: "Products found",
+            data: { products }
+        })
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err
+        })
+    }
+
+
+}
 
 
 // Create a product
-router.post('/', async (req, res) => {
+const create_handler = async (req, res) => {
     try {
         let {
             name,
@@ -68,18 +96,27 @@ router.post('/', async (req, res) => {
         })
     }
 
-})
+}
+
 
 
 // Update a product
-router.put('/', async (req, res) => {
+const update_handler = async (req, res) => {
 
-})
+}
 
 // delete a product
-router.delete('/', async (req, res) => {
+const delete_handler = async (req, res) => {
 
-})
+}
 
+
+
+
+router.route('/')
+    .get(read_handler)
+    .post(create_handler)
+    .put(update_handler)
+    .delete(delete_handler)
 
 module.exports = router
