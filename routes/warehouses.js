@@ -1,4 +1,4 @@
-const Warehouse = require('../schemas/warehouses');
+const Warehouse = require('../Schemas/warehouses');
 const { v4: uuidv4 } = require('uuid');
 const users = require('../Schemas/users');
 const router = require('express').Router()
