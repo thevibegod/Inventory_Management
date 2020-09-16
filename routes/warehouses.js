@@ -76,30 +76,30 @@ router.post('/assign', (req, res) => {
     }
     let fields = {}
     let [manager, gatekeeper] = [req.body.manager, req.body.gatekeeper]
-    if(manager){
-        users.findById(manager).then(data=>{
-            if(!data || data.role !== 'WRH_MGR'){
-                return res.status(400).json({ success: false, message: 'Invalid user or wrong user role.',data:manager })
+    if (manager) {
+        users.findById(manager).then(data => {
+            if (!data || data.role !== 'WRH_MGR') {
+                return res.status(400).json({ success: false, message: 'Invalid user or wrong user role.', data: manager })
             }
-            
+
         }).catch(
             err => res.status(500).json({ success: false, message: err })
         )
         fields.manager = manager;
     }
-    if(gatekeeper){
-        users.findById(gatekeeper).then(data=>{
-            if(!data || data.role !== 'GATE_KPR'){
-                return res.status(400).json({ success: false, message: 'Invalid user or wrong user role.',data:gatekeeper })
+    if (gatekeeper) {
+        users.findById(gatekeeper).then(data => {
+            if (!data || data.role !== 'GATE_KPR') {
+                return res.status(400).json({ success: false, message: 'Invalid user or wrong user role.', data: gatekeeper })
             }
-            
+
         }).catch(
             err => res.status(500).json({ success: false, message: err })
         )
         fields.gatekeeper = gatekeeper;
     }
-    if(Object.keys(fields).length===0){
-    
+    if (Object.keys(fields).length === 0) {
+
         return res.status(400).json({ success: false, message: 'No post data.' })
     }
     Warehouse.findOneAndUpdate({ warehouseID: req.query.id }, fields, { new: true }).then((data) => {

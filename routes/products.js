@@ -8,11 +8,10 @@ const read_handler = async (req, res) => {
         let query = {}
 
         if (req.query.id)
-            query = { prodcutID: req.query.id }
+            query = { productID: req.query.id }
 
         let products = await Product.find(query)
-
-        if (query.prodcutID != undefined && products.length == 0) {
+        if (query.productID != undefined && products.length == 0) {
             return res.status(404).json({
                 success: false,
                 message: "No product found with such id."
@@ -41,7 +40,7 @@ const create_handler = async (req, res) => {
     try {
         let {
             name,
-            prodcut_id: productID,
+            product_id: productID,
             category,
             sub_category: subCategory,
             weight,
@@ -103,10 +102,74 @@ const create_handler = async (req, res) => {
 // Update a product
 const update_handler = async (req, res) => {
 
+    try {
+        const productID = req.body.product_id
+
+        let {
+            name,
+            category,
+            sub_category: subCategory,
+            weight,
+            allowed_warehouse_ids: allowedWarehouses,
+            is_expirable: isExpriable,
+            expiry_period: expiryPeriod
+        } = req.body
+
+        let obj = {
+            name,
+            category,
+            subCategory,
+            weight,
+            allowedWarehouses,
+            isExpriable,
+            expiryPeriod
+        }
+
+
+        let db_obj = {}
+        for (let i in obj) {
+            if (obj[i] != null || obj[i] != undefined) {
+                db_obj[i] = obj[i]
+            }
+        }
+
+        console.log(db_obj)
+
+        let product = await Product.findOneAndUpdate({ productID: productID }, db_obj, { new: true })
+        console.log(product)
+
+        return res.status(202).json({
+            success: true,
+            message: "product successfully updated.",
+            data: { product }
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err
+        })
+    }
+
 }
 
 // delete a product
 const delete_handler = async (req, res) => {
+    try {
+        const product_id = req.query.id
+        const deleted_product = await Product.findOneAndDelete({ productID: product_id })
+        return res.status(202).json({
+            success: true,
+            message: "Product successfully deleted.",
+            data: { product: deleted_product }
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err
+        })
+    }
 
 }
 
