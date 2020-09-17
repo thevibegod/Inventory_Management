@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema
 
-    transactionTypes = ['Stock Creation', 'Stock Deletion', 'Stock Issuance', 'Stock Transfer']
+transactionTypes = ['Stock Creation', 'Stock Deletion', 'Stock Issuance', 'Stock Transfer']
 transactionStatuses = ['Initiated', 'Successful', 'Failure']
 var TransactionSchema = new Schema({
     type: { type: String, required: true, enum: transactionTypes },

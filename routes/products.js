@@ -1,6 +1,8 @@
 const router = require("express").Router()
 const Product = require('../Schemas/products')
+const Warehouse = require('../Schemas/warehouses')
 const { v4: uuidv4 } = require('uuid')
+const { set } = require("mongoose")
 
 // Get product(s)
 const read_handler = async (req, res) => {
@@ -176,10 +178,64 @@ const delete_handler = async (req, res) => {
 
 
 
+const dealWithWarehouseHandler = async (req, res) => {
+    const set_operations = require('../set_operations')
+
+    try {
+        const { product_id, warehouse_ids, operation_type } = req.body
+        console.log(warehouse_ids)
+        const product = await Product.findOne({ productID: product_id })
+
+
+        if (operation_type == "ASSIGN") {
+
+            const existing_warehouse_set = new Set([...product.allowedWarehouses].map(elem => elem.toHexString()))
+            const new_warehouse_set = new Set([...warehouse_ids])
+            const union_set = set_operations.union(existing_warehouse_set, new_warehouse_set)
+            let new_warehouses = Array.from(union_set)
+            product.allowedWarehouses = new_warehouses
+
+
+        } else if (operation_type == "RESIGN") {
+            let allowed_warehouses = new Set([...product.allowedWarehouses].map(elem => elem.toHexString()))
+            let warehouses_to_remove = new Set(warehouse_ids)
+            if (!set_operations.isSuperset(allowed_warehouses, warehouses_to_remove)) {
+                throw 'The requested warehouses contain some outbound elements.'
+            }
+
+            allowed_warehouses = Array.from(set_operations.difference(allowed_warehouses, warehouses_to_remove))
+            product.allowedWarehouses = allowed_warehouses
+        } else {
+        }
+
+        const saved_product = await product.save()
+
+        return res.status(200).json({
+            success: true,
+            message: 'product updated successfully. Data contains the modified product',
+            data: {
+                product: saved_product
+            }
+        })
+    }
+
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err
+        })
+    }
+}
+
+
+
 router.route('/')
     .get(read_handler)
     .post(create_handler)
     .put(update_handler)
     .delete(delete_handler)
+
+router.route("/warehouse_action/")
+    .post(dealWithWarehouseHandler)
 
 module.exports = router
