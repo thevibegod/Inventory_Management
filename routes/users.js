@@ -5,11 +5,16 @@ const app = express();
 app.route('/')
     .get(
         (req, res) => {
-            if (req.query.id) {
+            if (req.query.username) {
                 User.findOne({ username: req.query.username }).then(data => res.status(200).json({ success: true, data: data })).catch(
                     err => res.status(400).json({ success: false, message: err })
                 )
-            } else {
+            } else if (req.query.role) {
+                User.findOne({ role: req.query.role }).then(data => res.status(200).json({ success: true, data: data })).catch(
+                    err => res.status(400).json({ success: false, message: err }))
+            }
+
+            else {
                 User.find({}).then(data => res.status(200).json({ success: true, data: data })).catch(
                     err => res.status(400).json({ success: false, message: err })
                 )
