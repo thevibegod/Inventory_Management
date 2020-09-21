@@ -42,13 +42,13 @@ const create_handler = async (req, res) => {
     try {
         let {
             name,
-            product_id: productID,
+            productID,
             category,
-            sub_category: subCategory,
+            subCategory,
             weight,
-            allowed_warehouse_ids: allowedWarehouses,
-            is_expirable: isExpriable,
-            expiry_period: expiryPeriod
+            allowedWarehouses,
+            isExpriable,
+            expiryPeriod
         } = req.body
 
         const invalid = (elem) => {
@@ -105,16 +105,16 @@ const create_handler = async (req, res) => {
 const update_handler = async (req, res) => {
 
     try {
-        const productID = req.body.product_id
-
+        console.log(req.body)
         let {
+            productID,
             name,
             category,
-            sub_category: subCategory,
+            subCategory,
             weight,
-            allowed_warehouse_ids: allowedWarehouses,
-            is_expirable: isExpriable,
-            expiry_period: expiryPeriod
+            allowedWarehouses,
+            isExpriable,
+            expiryPeriod
         } = req.body
 
         let obj = {
@@ -126,7 +126,6 @@ const update_handler = async (req, res) => {
             isExpriable,
             expiryPeriod
         }
-
 
         let db_obj = {}
         for (let i in obj) {
@@ -140,7 +139,7 @@ const update_handler = async (req, res) => {
         let product = await Product.findOneAndUpdate({ productID: productID }, db_obj, { new: true })
         console.log(product)
 
-        return res.status(202).json({
+        return res.json({
             success: true,
             message: "product successfully updated.",
             data: { product }
